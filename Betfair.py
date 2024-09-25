@@ -58,7 +58,7 @@ def get_betfair_data(current_date_time, session_id):
                 e.event.id, market.market_id, e.event.open_date.date().isoformat(), e.event.open_date.time().isoformat(),
                 e.event.name,
                 get_home_team(e.event.name), get_away_team(e.event.name))
-            print(event_list)
+            # print(event_list)
             DBS.insert_match_details(event_list[0], event_list[1], event_list[2], event_list[3], event_list[4], event_list[5], event_list[6], session_id)
 
             for market_book in market_books:
@@ -78,11 +78,12 @@ def get_betfair_data(current_date_time, session_id):
                     elif runner.selection_id == market.runners[2].selection_id:
                         draw_back_odds = runner.ex.available_to_back[0].price if runner.ex.available_to_back else None
                         draw_lay_odds = runner.ex.available_to_lay[0].price if runner.ex.available_to_lay else None
-                match_odds_list = (
-                    e.event.id, market.market_id, formatted_now, home_back_odds, home_lay_odds, away_back_odds,
-                    away_lay_odds, draw_back_odds, draw_lay_odds, session_id)
-                DBS.insert_betfair_odds(match_odds_list[0],match_odds_list[1],match_odds_list[2],match_odds_list[3],match_odds_list[4],match_odds_list[5],match_odds_list[6],match_odds_list[7],match_odds_list[8],match_odds_list[9])
-                print(match_odds_list)
+
+
+                DBS.insert_betfair_odds(e.event.id, market.market_id, formatted_now, home_back_odds, home_lay_odds, away_back_odds,
+                                        away_lay_odds, draw_back_odds, draw_lay_odds, session_id)
+
+
     # Logout
     DBS.correct_team_names()
     trading.logout()
