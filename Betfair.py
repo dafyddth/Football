@@ -9,8 +9,6 @@ un = 'dafyddth'
 pw = 'HydrefY4ydd'
 key = 'n5AokgBdioLBhTNk'
 cert = 'C:\\Certs'
-now = datetime.now()
-formatted_now = now.strftime("%Y-%m-%d %H:%M:%S")
 
 
 def get_home_team(match):
@@ -80,7 +78,7 @@ def get_betfair_data(current_date_time, session_id):
                         draw_lay_odds = runner.ex.available_to_lay[0].price if runner.ex.available_to_lay else None
 
 
-                DBS.insert_betfair_odds(e.event.id, market.market_id, formatted_now, home_back_odds, home_lay_odds, away_back_odds,
+                DBS.insert_betfair_odds(e.event.id, market.market_id, current_date_time, home_back_odds, home_lay_odds, away_back_odds,
                                         away_lay_odds, draw_back_odds, draw_lay_odds, session_id)
 
 
