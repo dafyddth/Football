@@ -35,6 +35,6 @@ conn.commit()
 conn.execute("DELETE FROM tblTeamDictionary")
 conn.commit()
 for key in prem_teams.keys():
-    sql = f"INSERT INTO tblTeamDictionary(originalName, correctName) VALUES('{key}','{prem_teams.get(key)}');"
+    sql = f"INSERT OR IGNORE INTO tblTeamDictionary(originalName, correctName) VALUES('{key}','{prem_teams.get(key)}');"
     cursor.execute(sql)
 conn.commit()
