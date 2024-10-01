@@ -1,14 +1,18 @@
 import betfairlightweight
+import json
 from selenium.webdriver.common.devtools.v85.database import Database
-
 import Database as DBS
 from betfairlightweight import filters
 from datetime import datetime
 
-un = 'dafyddth'
-pw = 'HydrefY4ydd'
-key = 'n5AokgBdioLBhTNk'
-cert = 'C:\\Certs'
+with open('credentials.json') as config_file:
+    config = json.load(config_file)
+
+
+un = config['username']
+pw = config['password']
+key = config['api_key']
+cert = config['cert_path']
 
 
 def get_home_team(match):
