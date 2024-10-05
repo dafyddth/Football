@@ -3,6 +3,7 @@ import Scraper
 import datetime
 import Database
 
+
 now = datetime.datetime.now()
 current_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
 session_id = int(now.strftime("%Y%m%d%H%M%S"))
