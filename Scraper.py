@@ -24,6 +24,12 @@ def get_predicted_odds(current_date_time, session_id):
         matches = sel.xpath("//td[@class='fixt']/a/text()").getall()
         for match in matches:
             print(match)
+            teams = match.split('vs')
+            home_team
+
+            print('home: ',teams[0])
+            print('away: ', teams[1])
+
 
 
     elif website == forebet:
@@ -33,14 +39,16 @@ def get_predicted_odds(current_date_time, session_id):
         home_prob = sel.xpath("//div[@class='fprc']/span[1]/text()").getall()
         draw_prob = sel.xpath("//div[@class='fprc']/span[2]/text()").getall()
         away_prob = sel.xpath("//div[@class='fprc']/span[3]/text()").getall()
-
-        for i in range(15): # REPLACE WITH HOME TEAMS COUNT
+        print("no_home_prob", len(home_prob))
+        for i in range(len(home_prob)-1): # REPLACE WITH HOME TEAMS COUNT
+            print(i)
+            print(home_teams[i])
             home_odds = f.percentage_to_decimal_odds(int(home_prob[i + 1]))
             draw_odds = f.percentage_to_decimal_odds(int(draw_prob[i + 1]))
             away_odds = f.percentage_to_decimal_odds(int(away_prob[i + 1]))
             match_date = f.date_from_string(match_date_time[i])
             match_time = f.time_from_string(match_date_time[i]).strftime('%H:%M:%S')
-            print(match_date_time[i] , current_date_time, home_teams[i],'v', away_teams[i] , home_odds, draw_odds, away_odds)
+            print(match_date_time[i] , current_date_time, home_teams[i],'v', away_teams[i] , home_prob[i + 1], home_odds, draw_odds, away_odds)
             print(match_date)
             print(match_time)
 
