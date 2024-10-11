@@ -43,6 +43,15 @@ def insert_forebet_odds(odds_date, home_odds, draw_odds, away_odds, session_id, 
     conn.close()
 
 
+def insert_predictz_odds(odds_date, home_odds, draw_odds, away_odds, home_team, away_team, session_id):
+    sql = "INSERT INTO PredictzOdds (OddsDate, PZHomeBackOdds, PZAwayBackOdds, PZDrawBackOdds, HomeTeam, AwayTeam, SessionID)" \
+        " VALUES(?,?,?,?,?,?,?)"
+    conn = sqlite3.connect('Football.db')
+    cursor = conn.cursor()
+    cursor.execute(sql, (odds_date, home_odds, draw_odds,away_odds, home_team, away_team, session_id))
+    conn.commit()
+    conn.close()
+
 def correct_team_names():
     conn = sqlite3.connect('Football.db')
     cursor = conn.cursor()
@@ -62,3 +71,14 @@ def correct_team_names():
            "tblTeamDictionary WHERE ForebetOdds.AwayTeam = tblTeamDictionary.originalName")
     cursor.execute(sql)
     conn.commit()
+
+    sql = ("UPDATE PredictzOdds SET HomeTeam = tblTeamDictionary.CorrectName FROM "
+           "tblTeamDictionary WHERE PredictzOdds.HomeTeam = tblTeamDictionary.originalName ")
+
+    cursor.execute(sql)
+    conn.commit()
+    sql = ("UPDATE PredictzOdds SET AwayTeam = tblTeamDictionary.CorrectName FROM "
+           "tblTeamDictionary WHERE PredictzOdds.AwayTeam = tblTeamDictionary.originalName")
+    cursor.execute(sql)
+    conn.commit()
+    conn.close()
