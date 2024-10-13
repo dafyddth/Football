@@ -87,7 +87,7 @@ def get_betfair_data(current_date_time, session_id):
 
                 DBS.insert_betfair_odds(e.event.id, market.market_id, current_date_time, home_back_odds, home_lay_odds,
                                         away_back_odds,
-                                        away_lay_odds, draw_back_odds, draw_lay_odds, session_id)
+                                        away_lay_odds, draw_back_odds, draw_lay_odds, session_id, market.total_matched)
 
     # Logout
     DBS.correct_team_names()

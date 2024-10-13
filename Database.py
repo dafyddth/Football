@@ -19,14 +19,14 @@ def insert_match_details(bf_event_id, bf_market_id, match_date, match_time, matc
 
 def insert_betfair_odds(bf_event_id, bf_market_id, odds_date, bf_home_back_odds, bf_home_lay_odds, bf_away_back_odds,
                         bf_draw_back_odds,
-                        bf_away_lay_odds, bf_draw_lay_odds, session_id):
+                        bf_away_lay_odds, bf_draw_lay_odds, session_id, total_matched):
     sql = ("INSERT INTO BetfairOdds (BFEventID, BFMarketID, OddsDate, BFHomeBackOdds, BFHomeLayOdds, BFAwayBackOdds, "
-           " BFAwayLayOdds, BFDrawBackOdds,  BFDrawLayOdds, SessionID) "
-           "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
+           " BFAwayLayOdds, BFDrawBackOdds,  BFDrawLayOdds, SessionID, TotalMatched) "
+           "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
     conn = sqlite3.connect('Football.db')
     cursor = conn.cursor()
     cursor.execute(sql, (bf_event_id, bf_market_id, odds_date, bf_home_back_odds, bf_home_lay_odds, bf_away_back_odds,
-                         bf_draw_back_odds, bf_away_lay_odds, bf_draw_lay_odds, session_id))
+                         bf_draw_back_odds, bf_away_lay_odds, bf_draw_lay_odds, session_id, total_matched))
     conn.commit()
     conn.close()
 
