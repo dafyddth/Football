@@ -38,47 +38,77 @@ def insert_forebet_odds(odds_date, home_odds, draw_odds, away_odds, session_id, 
     conn = sqlite3.connect('Football.db')
     cursor = conn.cursor()
     cursor.execute(sql, (
-    odds_date, home_odds, draw_odds, away_odds, session_id, home_team, away_team, match_date, match_time))
+        odds_date, home_odds, draw_odds, away_odds, session_id, home_team, away_team, match_date, match_time))
     conn.commit()
     conn.close()
 
 
 def insert_predictz_odds(odds_date, home_odds, draw_odds, away_odds, home_team, away_team, session_id):
     sql = "INSERT INTO PredictzOdds (OddsDate, PZHomeBackOdds, PZAwayBackOdds, PZDrawBackOdds, HomeTeam, AwayTeam, SessionID)" \
-        " VALUES(?,?,?,?,?,?,?)"
+          " VALUES(?,?,?,?,?,?,?)"
     conn = sqlite3.connect('Football.db')
     cursor = conn.cursor()
-    cursor.execute(sql, (odds_date, home_odds, draw_odds,away_odds, home_team, away_team, session_id))
+    cursor.execute(sql, (odds_date, home_odds, draw_odds, away_odds, home_team, away_team, session_id))
     conn.commit()
     conn.close()
+
+
+def update_predictz_table():
+    sql = """
+WITH UpdateSource AS (
+    SELECT DISTINCT B.SessionID,
+                    M.Date,
+                    M.Time,
+                    M.HomeTeam
+      FROM BetfairOdds B
+           INNER JOIN
+           Market M ON B.BFMarketID = M.BFMarketID
+)
+UPDATE PredictzOdds
+   SET MatchDate = (
+           SELECT U.Date
+             FROM UpdateSource U
+            WHERE PredictzOdds.SessionID = U.SessionID AND 
+                  PredictzOdds.HomeTeam = U.HomeTeam
+       ),
+       MatchTime = (
+           SELECT U.Time
+             FROM UpdateSource U
+            WHERE PredictzOdds.SessionID = U.SessionID AND 
+                  PredictzOdds.HomeTeam = U.HomeTeam
+       );
+
+    """
+    conn = sqlite3.connect('Football.db')
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    conn.commit()
+    conn.close()
+
 
 def correct_team_names():
     conn = sqlite3.connect('Football.db')
     cursor = conn.cursor()
+    sql = "update Market SET HomeTeam = trim(HomeTeam), AwayTeam = trim(AwayTeam);"
+    cursor.execute(sql)
     sql = ("UPDATE Market SET HomeTeam = tblTeamDictionary.CorrectName FROM "
            "tblTeamDictionary WHERE Market.HomeTeam = tblTeamDictionary.originalName")
     cursor.execute(sql)
     sql = ("UPDATE Market SET AwayTeam = tblTeamDictionary.CorrectName FROM "
            "tblTeamDictionary WHERE Market.AwayTeam = tblTeamDictionary.originalName")
     cursor.execute(sql)
-    conn.commit()
     sql = ("UPDATE ForebetOdds SET HomeTeam = tblTeamDictionary.CorrectName FROM "
-           "tblTeamDictionary WHERE ForebetOdds.HomeTeam = tblTeamDictionary.originalName ")
-
+           "tblTeamDictionary WHERE trim(ForebetOdds.HomeTeam) = tblTeamDictionary.originalName ")
     cursor.execute(sql)
     conn.commit()
     sql = ("UPDATE ForebetOdds SET AwayTeam = tblTeamDictionary.CorrectName FROM "
-           "tblTeamDictionary WHERE ForebetOdds.AwayTeam = tblTeamDictionary.originalName")
+           "tblTeamDictionary WHERE trim(ForebetOdds.AwayTeam) = tblTeamDictionary.originalName")
     cursor.execute(sql)
-    conn.commit()
-
     sql = ("UPDATE PredictzOdds SET HomeTeam = tblTeamDictionary.CorrectName FROM "
-           "tblTeamDictionary WHERE PredictzOdds.HomeTeam = tblTeamDictionary.originalName ")
-
+           "tblTeamDictionary WHERE trim(PredictzOdds.HomeTeam) = tblTeamDictionary.originalName ")
     cursor.execute(sql)
-    conn.commit()
     sql = ("UPDATE PredictzOdds SET AwayTeam = tblTeamDictionary.CorrectName FROM "
-           "tblTeamDictionary WHERE PredictzOdds.AwayTeam = tblTeamDictionary.originalName")
+           "tblTeamDictionary WHERE trim(PredictzOdds.AwayTeam) = tblTeamDictionary.originalName")
     cursor.execute(sql)
     conn.commit()
     conn.close()

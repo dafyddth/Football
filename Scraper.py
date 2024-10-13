@@ -43,6 +43,8 @@ def get_predicted_odds(current_date_time, session_id, site):
 
             print(home_team, away_team, home_odds, draw_odds, away_odds)
             DBS.insert_predictz_odds(current_date_time, home_odds, draw_odds, away_odds, home_team, away_team, session_id)
+            DBS.correct_team_names()
+            DBS.update_predictz_table()
         print("no of matches ", len(matches))
         print("no of odds ", len(odds))
 
@@ -74,3 +76,4 @@ def get_predicted_odds(current_date_time, session_id, site):
             if match_datetime > datetime.strptime(current_date_time, '%Y-%m-%d %H:%M:%S'):
                 DBS.insert_forebet_odds(current_date_time, home_odds, draw_odds, away_odds, session_id, home_teams[i],
                                         away_teams[i], match_date, match_time)
+                DBS.correct_team_names()

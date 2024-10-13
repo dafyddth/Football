@@ -8,7 +8,6 @@ from datetime import datetime
 with open('credentials.json') as config_file:
     config = json.load(config_file)
 
-
 un = config['username']
 pw = config['password']
 key = config['api_key']
@@ -25,6 +24,7 @@ def get_away_team(match):
     # Split the string by ' V ' and return the second part
     away_team = match.split(' v ')[1]
     return away_team
+
 
 def get_betfair_data(current_date_time, session_id):
     # Create a trading instance
@@ -57,11 +57,13 @@ def get_betfair_data(current_date_time, session_id):
                 price_projection=filters.price_projection(price_data=['EX_BEST_OFFERS'])
             )
             event_list = (
-                e.event.id, market.market_id, e.event.open_date.date().isoformat(), e.event.open_date.time().isoformat(),
+                e.event.id, market.market_id, e.event.open_date.date().isoformat(),
+                e.event.open_date.time().isoformat(),
                 e.event.name,
                 get_home_team(e.event.name), get_away_team(e.event.name))
             # print(event_list)
-            DBS.insert_match_details(event_list[0], event_list[1], event_list[2], event_list[3], event_list[4], event_list[5], event_list[6], session_id)
+            DBS.insert_match_details(event_list[0], event_list[1], event_list[2], event_list[3], event_list[4],
+                                     event_list[5], event_list[6], session_id)
 
             for market_book in market_books:
                 home_back_odds = 0
@@ -70,6 +72,8 @@ def get_betfair_data(current_date_time, session_id):
                 away_lay_odds = 0
                 draw_back_odds = 0
                 draw_lay_odds = 0
+
+                print(f'Total Matched{e.event.name}  {market_book.total_matched}')
                 for runner in market_book.runners:
                     if runner.selection_id == market.runners[0].selection_id:
                         home_back_odds = runner.ex.available_to_back[0].price if runner.ex.available_to_back else None
@@ -81,10 +85,9 @@ def get_betfair_data(current_date_time, session_id):
                         draw_back_odds = runner.ex.available_to_back[0].price if runner.ex.available_to_back else None
                         draw_lay_odds = runner.ex.available_to_lay[0].price if runner.ex.available_to_lay else None
 
-
-                DBS.insert_betfair_odds(e.event.id, market.market_id, current_date_time, home_back_odds, home_lay_odds, away_back_odds,
+                DBS.insert_betfair_odds(e.event.id, market.market_id, current_date_time, home_back_odds, home_lay_odds,
+                                        away_back_odds,
                                         away_lay_odds, draw_back_odds, draw_lay_odds, session_id)
-
 
     # Logout
     DBS.correct_team_names()
