@@ -1,0 +1,30 @@
+SELECT 
+    M.BFMarketID,
+    M.HomeTeam,
+    M.AwayTeam,
+    M.Match,
+    M.Date as MatchDate,
+    B.OddsDate,
+    B.BFHomeBackOdds,
+    B.BFHomeLayOdds,
+    B.BFDrawBackOdds,
+    B.BFDrawLayOdds,
+    B.BFAwayBackOdds,
+    B.BFAwayLayOdds,
+    B.TotalMatched
+FROM 
+    Market M
+INNER JOIN 
+    BetfairOdds B ON M.BFMarketID = B.BFMarketID
+INNER JOIN (
+    SELECT 
+        MIN(SessionID) AS MinSessionID,
+        BFMarketID
+    FROM 
+        BetfairOdds
+    WHERE 
+        TotalMatched > 2000
+    GROUP BY 
+        BFMarketID
+) x ON B.SessionID = x.MinSessionID
+   AND B.BFMarketID = x.BFMarketID;
