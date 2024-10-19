@@ -112,3 +112,55 @@ def correct_team_names():
     cursor.execute(sql)
     conn.commit()
     conn.close()
+
+
+def update_marketids():
+    conn = sqlite3.connect('Football.db')
+    cursor = conn.cursor()
+
+    # Update ForebetOdds
+    sql_forebet = """
+    UPDATE ForebetOdds
+    SET MarketID = (
+        SELECT M.BFMarketID
+        FROM Market M
+        WHERE 
+            M.AwayTeam = ForebetOdds.AwayTeam
+            AND M.HomeTeam = ForebetOdds.HomeTeam
+            AND M.Date = ForebetOdds.MatchDate
+    )
+    WHERE EXISTS (
+        SELECT 1
+        FROM Market M
+        WHERE 
+            M.AwayTeam = ForebetOdds.AwayTeam
+            AND M.HomeTeam = ForebetOdds.HomeTeam
+            AND M.Date = ForebetOdds.MatchDate
+    );
+    """
+    cursor.execute(sql_forebet)
+
+    # Update PredictzOdds
+    sql_predictz = """
+    UPDATE PredictzOdds
+    SET MarketID = (
+        SELECT M.BFMarketID
+        FROM Market M
+        WHERE 
+            M.AwayTeam = PredictzOdds.AwayTeam
+            AND M.HomeTeam = PredictzOdds.HomeTeam
+            AND M.Date = PredictzOdds.MatchDate
+    )
+    WHERE EXISTS (
+        SELECT 1
+        FROM Market M
+        WHERE 
+            M.AwayTeam = PredictzOdds.AwayTeam
+            AND M.HomeTeam = PredictzOdds.HomeTeam
+            AND M.Date = PredictzOdds.MatchDate
+    );
+    """
+    cursor.execute(sql_predictz)
+
+    conn.commit()
+    conn.close()
