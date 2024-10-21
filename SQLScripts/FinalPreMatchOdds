@@ -1,0 +1,17 @@
+SELECT 
+BFHomeBackOdds,
+BFAwayBackOdds,
+BFMarketID,
+SessionID,
+OddsDate
+FROM
+BetfairOdds B
+INNER JOIN
+
+(
+SELECT B.BFMarketID, MAX(B.SessionID)
+FROM BetfairOdds B
+INNER JOIN Market M on M.BFMarketID = B.BFMarketID 
+WHERE B.OddsDate < datetime(M.Date || ' ' || M.Time)
+GROUP BY B.BFMarketID
+)
