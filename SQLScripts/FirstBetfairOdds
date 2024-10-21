@@ -11,7 +11,8 @@ SELECT
     B.BFDrawLayOdds,
     B.BFAwayBackOdds,
     B.BFAwayLayOdds,
-    B.TotalMatched
+    B.TotalMatched,
+    B.SessionID
 FROM 
     Market M
 INNER JOIN 
