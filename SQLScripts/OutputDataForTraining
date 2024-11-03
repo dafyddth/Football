@@ -1,37 +1,132 @@
-SELECT 
-    M.BFMarketID,
-    M.HomeTeam,
-    M.AwayTeam,
-    M.Match,
-    M.Date as MatchDate,
-    B.OddsDate,
-    B.BFHomeBackOdds as OriginalBackOdds,
-    B.BFHomeLayOdds as OriginalLayOdds,
-    B.TotalMatched,
-    B.SessionID,
-    FB.FBHomeBackOdds as FB_Odds,
-    P.PZHomeBackOdds as PZ_Odds
-FROM 
-    Market M
-INNER JOIN 
-    BetfairOdds B ON M.BFMarketID = B.BFMarketID
-INNER JOIN (
-    SELECT 
-        MIN(B.SessionID) AS MinSessionID,
-        BFMarketID
-    FROM 
-        BetfairOdds B
-    INNER JOIN PredictzOdds P
-    ON B.SessionID = P.SessionID AND B.BFMarketID = P.MarketID
-    INNER JOIN ForeBetOdds F
-    ON B.SessionID = F.SessionID AND B.BFMarketID = F.MarketID
-    
-    WHERE 
-        TotalMatched > 2000
-        
-    GROUP BY 
-        BFMarketID
-) starting_odds ON B.SessionID = starting_odds.MinSessionID
-   AND B.BFMarketID = starting_odds.BFMarketID
-LEFT JOIN ForeBetOdds FB on B.SessionID = FB.SessionID and B.BFMarketID = FB.MarketID
-LEFT JOIN PredictzOdds P on B.SessionID = P.SessionID and B.BFMarketID = P.MarketID ;
+SELECT M.BFMarketID,
+       M.HomeTeam,
+       M.AwayTeam,
+       M.Match,
+       M.Date AS MatchDate,
+       B.OddsDate AS OriginalOddsDate,
+       FB.FBHomeBackOdds AS FB_Odds,
+       P.PZHomeBackOdds AS PZ_Odds,
+       B.BFHomeBackOdds AS OriginalBackOdds,
+       B.BFHomeLayOdds AS OriginalLayOdds,
+       B.TotalMatched AS OriginalTotalMatched,
+       FinalOdds.OddsDate AS FinalOddsDate,
+       FinalOdds.BFHomeBackOdds AS FinalBackOdds,
+       1 AS HomeWin,
+       0 AS Draw,
+       0 AS AwayWin
+       
+       
+  FROM Market M
+       INNER JOIN
+       BetfairOdds B ON M.BFMarketID = B.BFMarketID
+       INNER JOIN
+       (
+           SELECT MIN(B.SessionID) AS MinSessionID,
+                  B.BFMarketID
+             FROM BetfairOdds B
+                  INNER JOIN
+                  PredictzOdds P ON B.SessionID = P.SessionID AND 
+                                    B.BFMarketID = P.MarketID
+                  INNER JOIN
+                  ForeBetOdds F ON B.SessionID = F.SessionID AND 
+                                   B.BFMarketID = F.MarketID
+           WHERE B.TotalMatched > 2000
+            GROUP BY B.BFMarketID
+       )
+       starting_odds ON B.SessionID = starting_odds.MinSessionID AND 
+                        B.BFMarketID = starting_odds.BFMarketID
+       LEFT JOIN
+       ForeBetOdds FB ON B.SessionID = FB.SessionID AND 
+                         B.BFMarketID = FB.MarketID
+       LEFT JOIN
+       PredictzOdds P ON B.SessionID = P.SessionID AND 
+                         B.BFMarketID = P.MarketID
+INNER JOIN
+(SELECT B.BFHomeBackOdds,
+        B.BFAwayBackOdds,
+        B.BFDrawBackOdds,
+        B.BFMarketID,
+        B.SessionID,
+        B.OddsDate
+   FROM BetfairOdds B
+        INNER JOIN
+        (
+            SELECT B.BFMarketID,
+                   MAX(B.SessionID) MaxLastSession
+              FROM BetfairOdds B
+                   INNER JOIN
+                   Market M ON M.BFMarketID = B.BFMarketID
+             WHERE B.OddsDate < datetime(M.Date || ' ' || M.Time) 
+             GROUP BY B.BFMarketID
+        )
+        AS lastSession ON B.SessionID = lastSession.MaxLastSession AND 
+                          B.BFMarketID = lastSession.BFMarketID) FinalOdds
+ON M.BFMarketID = FinalOdds.BFMarketID
+
+UNION
+
+
+SELECT M.BFMarketID,
+       M.HomeTeam,
+       M.AwayTeam,
+       M.Match,
+       M.Date AS MatchDate,
+       B.OddsDate AS OriginalOddsDate,
+       FB.FBDrawBackOdds AS FB_Odds,
+       P.PZDrawBackOdds AS PZ_Odds,
+       B.BFDrawBackOdds AS OriginalBackOdds,
+       B.BFDrawLayOdds AS OriginalLayOdds,
+       B.TotalMatched AS OriginalTotalMatched,
+       FinalOdds.OddsDate AS FinalOddsDate,
+       FinalOdds.BFDrawBackOdds AS FinalBackOdds,
+       1 AS HomeWin,
+       0 AS Draw,
+       0 AS AwayWin
+       
+       
+  FROM Market M
+       INNER JOIN
+       BetfairOdds B ON M.BFMarketID = B.BFMarketID
+       INNER JOIN
+       (
+           SELECT MIN(B.SessionID) AS MinSessionID,
+                  B.BFMarketID
+             FROM BetfairOdds B
+                  INNER JOIN
+                  PredictzOdds P ON B.SessionID = P.SessionID AND 
+                                    B.BFMarketID = P.MarketID
+                  INNER JOIN
+                  ForeBetOdds F ON B.SessionID = F.SessionID AND 
+                                   B.BFMarketID = F.MarketID
+           WHERE B.TotalMatched > 2000
+            GROUP BY B.BFMarketID
+       )
+       starting_odds ON B.SessionID = starting_odds.MinSessionID AND 
+                        B.BFMarketID = starting_odds.BFMarketID
+       LEFT JOIN
+       ForeBetOdds FB ON B.SessionID = FB.SessionID AND 
+                         B.BFMarketID = FB.MarketID
+       LEFT JOIN
+       PredictzOdds P ON B.SessionID = P.SessionID AND 
+                         B.BFMarketID = P.MarketID
+INNER JOIN
+(SELECT B.BFHomeBackOdds ,
+        B.BFAwayBackOdds,
+        B.BFDrawBackOdds,
+        B.BFMarketID,
+        B.SessionID,
+        B.OddsDate
+   FROM BetfairOdds B
+        INNER JOIN
+        (
+            SELECT B.BFMarketID,
+                   MAX(B.SessionID) MaxLastSession
+              FROM BetfairOdds B
+                   INNER JOIN
+                   Market M ON M.BFMarketID = B.BFMarketID
+             WHERE B.OddsDate < datetime(M.Date || ' ' || M.Time) 
+             GROUP BY B.BFMarketID
+        )
+        AS lastSession ON B.SessionID = lastSession.MaxLastSession AND 
+                          B.BFMarketID = lastSession.BFMarketID) FinalOdds
+ON M.BFMarketID = FinalOdds.BFMarketID

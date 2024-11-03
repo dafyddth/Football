@@ -28,7 +28,7 @@ def get_away_team(match):
 
 def get_betfair_data(current_date_time, session_id):
     # Create a trading instance
-    trading = betfairlightweight.APIClient(un, pw, key, certs=cert)
+    trading = betfairlightweight.APIClient(un, pw, key, certs=cert,locale='en_GB')
 
     # Login
     trading.login()
