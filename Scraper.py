@@ -3,24 +3,16 @@ from lxml.html.diff import split_words
 import Database as DBS
 import SeleniumChrome
 import SeleniumFirefox
-from datetime import datetime
 import functions as f
+from datetime import datetime
 
 from parsel import Selector
 from selenium.webdriver.common.devtools.v85.database import Database
 
+
 #current_datetime = datetime.strptime(current_date_time, '%Y-%m-%d %H:%M:%S')
 
 
-def datetime_from_string(date_time_string):
-    date_formats = ['%d/%m/%Y %H:%M', '%d/%m/%Y']
-    for date_format in date_formats:
-        try: 
-            datetime_obj = datetime.strptime(date_time_string, date_format)
-            return datetime_obj
-        except ValueError:
-            continue
-    raise ValueError("Date string does not match any expected format")
 
 
 
@@ -55,11 +47,13 @@ def get_predicted_odds(current_date_time, session_id, site):
             match_counter += 3
 
             print(home_team, away_team, home_odds, draw_odds, away_odds)
-            DBS.insert_predictz_odds(current_date_time, home_odds, draw_odds, away_odds, home_team, away_team, session_id)
+            DBS.insert_predictz_odds(current_date_time, home_odds, draw_odds, away_odds, home_team, away_team,
+                                     session_id)
             DBS.correct_team_names()
             DBS.update_predictz_table()
         print("no of matches ", len(matches))
         print("no of odds ", len(odds))
+        print(f.return_rubbish())
 
 
 
@@ -84,9 +78,10 @@ def get_predicted_odds(current_date_time, session_id, site):
                   draw_odds, away_odds)
             print(match_date)
             print(match_time)
-            
-            match_datetime = datetime_from_string(match_date_time[i])
+
+            match_datetime = f.datetime_from_string(match_date_time[i])
             if match_datetime > datetime.strptime(current_date_time, '%Y-%m-%d %H:%M:%S'):
                 DBS.insert_forebet_odds(current_date_time, home_odds, draw_odds, away_odds, session_id, home_teams[i],
                                         away_teams[i], match_date, match_time)
                 DBS.correct_team_names()
+

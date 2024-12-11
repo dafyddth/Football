@@ -13,6 +13,7 @@ def time_from_string(date_time_string):
     return time(0, 0)
 
 
+
 def date_from_string(date_time_string):
     date_formats = ['%d/%m/%Y %H:%M', '%d/%m/%Y']
     for date_format in date_formats:
@@ -31,8 +32,18 @@ def percentage_to_decimal_odds(percentage):
     decimal_odds = round(1 / probability, 1)
     return decimal_odds
 
+def return_rubbish():
+    return "dfsdfhskjgfhgjkhjagsdakjfhds"
+
+def datetime_from_string(date_time_string):
+    date_formats = ['%d/%m/%Y %H:%M', '%d/%m/%Y']
+    for date_format in date_formats:
+        try:
+            datetime_obj = datetime.strptime(date_time_string, date_format)
+            return datetime_obj
+        except ValueError:
+            continue
+    raise ValueError("Date string does not match any expected format")
 
 
-def return_one():
-    return 1
 

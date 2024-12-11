@@ -2,8 +2,10 @@ import betfairlightweight
 import json
 from selenium.webdriver.common.devtools.v85.database import Database
 import Database as DBS
+import functions as f
 from betfairlightweight import filters
 from datetime import datetime
+
 
 with open('credentials.json') as config_file:
     config = json.load(config_file)
@@ -17,6 +19,7 @@ cert = config['cert_path']
 def get_home_team(match):
     # Split the string by ' V ' and return the first part
     home_team = match.split(' v ')[0]
+
     return home_team
 
 
